@@ -1,46 +1,112 @@
 #!/bin/bash
 
-rm -rf $(pwd)/$0
+function install_udpmod {
+    rm -rf $(pwd)/$0
 
-read -p " ingresa tu dominio: " domain
+    read -p "Ingresa tu dominio: " domain
 
-apt update -y; apt upgrade -y; apt install git -y
+    apt update -y
+    apt upgrade -y
+    apt install git -y
 
-git clone https://github.com/SparkerMoved/UDPMOD.git
+    git clone https://github.com/SparkerMoved/UDPMOD.git
 
-dir=$(pwd)
+    dir=$(pwd)
 
-OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
+    OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
 
-interfas=$(ip -4 route ls|grep default|grep -Po '(?<=dev )(\S+)'|head -1)
+    interfas=$(ip -4 route ls|grep default|grep -Po '(?<=dev )(\S+)'|head -1)
 
-sys=$(which sysctl)
+    sys=$(which sysctl)
 
-ip4t=$(which iptables)
-ip6t=$(which ip6tables)
+    ip4t=$(which iptables)
+    ip6t=$(which ip6tables)
 
-openssl genrsa -out ${dir}/UDPMOD/udpmod.ca.key 2048
-openssl req -new -x509 -days 3650 -key ${dir}/UDPMOD/udpmod.ca.key -subj "/C=CN/ST=GD/L=SZ/O=Udpmod, Inc./CN=Udpmod Root CA" -out ${dir}/UDPMOD/udpmod.ca.crt
-openssl req -newkey rsa:2048 -nodes -keyout ${dir}/UDPMOD/udpmod.server.key -subj "/C=CN/ST=GD/L=SZ/O=Udpmod, Inc./CN=${domain}" -out ${dir}/UDPMOD/udpmod.server.csr
-openssl x509 -req -extfile <(printf "subjectAltName=DNS:${domain},DNS:${domain}") -days 3650 -in ${dir}/UDPMOD/udpmod.server.csr -CA ${dir}/UDPMOD/udpmod.ca.crt -CAkey ${dir}/UDPMOD/udpmod.ca.key -CAcreateserial -out ${dir}/UDPMOD/udpmod.server.crt
+    openssl genrsa -out ${dir}/UDPMOD/udpmod.ca.key 2048
+    openssl req -new -x509 -days 3650 -key ${dir}/UDPMOD/udpmod.ca.key -subj "/C=CN/ST=GD/L=SZ/O=Udpmod, Inc./CN=Udpmod Root CA" -out ${dir}/UDPMOD/udpmod.ca.crt
+    openssl req -newkey rsa:2048 -nodes -keyout ${dir}/UDPMOD/udpmod.server.key -subj "/C=CN/ST=GD/L=SZ/O=Udpmod, Inc./CN=${domain}" -out ${dir}/UDPMOD/udpmod.server.csr
+    openssl x509 -req -extfile <(printf "subjectAltName=DNS:${domain},DNS:${domain}") -days 3650 -in ${dir}/UDPMOD/udpmod.server.csr -CA ${dir}/UDPMOD/udpmod.ca.crt -CAkey ${dir}/UDPMOD/udpmod.ca.key -CAcreateserial -out ${dir}/UDPMOD/udpmod.server.crt
 
-sed -i "s/setobfs/${OBFS}/" ${dir}/UDPMOD/config.json
-sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/config.json
-sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/udpmod.service
-sed -i "s#iptb#${interfas}#g" ${dir}/UDPMOD/udpmod.service
-sed -i "s#sysb#${sys}#g" ${dir}/UDPMOD/udpmod.service
-sed -i "s#ip4tbin#${ip4t}#g" ${dir}/UDPMOD/udpmod.service
-sed -i "s#ip6tbin#${ip6t}#g" ${dir}/UDPMOD/udpmod.service
+    sed -i "s/setobfs/${OBFS}/" ${dir}/UDPMOD/config.json
+    sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/config.json
+    sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/udpmod.service
+    sed -i "s#iptb#${interfas}#g" ${dir}/UDPMOD/udpmod.service
+    sed -i "s#sysb#${sys}#g" ${dir}/UDPMOD/udpmod.service
+    sed -i "s#ip4tbin#${ip4t}#g" ${dir}/UDPMOD/udpmod.service
+    sed -i "s#ip6tbin#${ip6t}#g" ${dir}/UDPMOD/udpmod.service
 
-chmod +x ${dir}/UDPMOD/*
+    chmod +x ${dir}/UDPMOD/*
 
-install -Dm644 ${dir}/UDPMOD/udpmod.service /etc/systemd/system
+    install -Dm644 ${dir}/UDPMOD/udpmod.service /etc/systemd/system
 
-systemctl daemon-reload
-systemctl start udpmod
-systemctl enable udpmod
+    systemctl daemon-reload
+    systemctl start udpmod
+    systemctl enable udpmod
 
-echo " obfs: ${OBFS}" > ${dir}/UDPMOD/data
-echo "port: 36712" >> ${dir}/UDPMOD/data
-echo "rago de puertos: 10000:65000" >> ${dir}/UDPMOD/data
-cat ${dir}/UDPMOD/data
+    echo "obfs: ${OBFS}" > ${dir}/UDPMOD/data
+    echo "port: 36712" >> ${dir}/UDPMOD/data
+    echo "rango de puertos: 10000:65000" >> ${dir}/UDPMOD/data
+    cat ${dir}/UDPMOD/data
+}
+
+function uninstall_udpmod {
+    systemctl stop udpmod
+    systemctl disable udpmod
+    rm -f /etc/systemd/system/udpmod.service
+    systemctl daemon-reload
+    rm -rf $(pwd)/UDPMOD
+    echo "UDPMOD desinstalado."
+}
+
+function activate_udpmod {
+    if systemctl is-active --quiet udpmod; then
+        echo "UDPMOD ya está activo."
+    else
+        if [ ! -d "$(pwd)/UDPMOD" ]; then
+            install_udpmod
+        else
+            systemctl start udpmod
+            echo "UDPMOD activado."
+        fi
+    fi
+}
+
+function check_installation {
+    if systemctl is-active --quiet udpmod; then
+        echo "UDPMOD está instalado y activo."
+    else
+        echo "UDPMOD no está activo."
+    fi
+}
+
+function change_port {
+    read -p "Ingresa el nuevo puerto: " new_port
+    sed -i "s/\"port\": [0-9]\+/$new_port/" $(pwd)/UDPMOD/config.json
+    echo "El puerto ha sido cambiado a ${new_port}."
+    echo "port: ${new_port}" > $(pwd)/UDPMOD/data
+    systemctl restart udpmod
+    echo "UDPMOD ha sido reiniciado con el nuevo puerto."
+}
+
+function menu {
+    echo "1. Instalar UDPMOD"
+    echo "2. Desinstalar UDPMOD"
+    echo "3. Activar UDPMOD"
+    echo "4. Verificar instalación"
+    echo "5. Cambiar puerto"
+    echo "6. Salir"
+    read -p "Elige una opción: " choice
+    case $choice in
+        1) install_udpmod ;;
+        2) uninstall_udpmod ;;
+        3) activate_udpmod ;;
+        4) check_installation ;;
+        5) change_port ;;
+        6) exit 0 ;;
+        *) echo "Opción no válida" ;;
+    esac
+}
+
+while true; do
+    menu
+done
