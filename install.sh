@@ -105,6 +105,16 @@ function change_port {
     read -p "Presiona Enter para volver al menú..."
 }
 
+function show_data {
+    clear
+    if [ -f $(pwd)/UDPMOD/data ]; then
+        cat $(pwd)/UDPMOD/data
+    else
+        echo "No se encontró el archivo de datos."
+    fi
+    read -p "Presiona Enter para volver al menú..."
+}
+
 function menu {
     clear
     echo "1. Instalar UDPMOD"
@@ -112,7 +122,8 @@ function menu {
     echo "3. Activar UDPMOD"
     echo "4. Verificar instalación"
     echo "5. Cambiar puerto"
-    echo "6. Salir"
+    echo "6. Mostrar datos"
+    echo "7. Salir"
     read -p "Elige una opción: " choice
     case $choice in
         1) install_udpmod ;;
@@ -120,7 +131,8 @@ function menu {
         3) activate_udpmod ;;
         4) check_installation ;;
         5) change_port ;;
-        6) exit 0 ;;
+        6) show_data ;;
+        7) exit 0 ;;
         *) echo "Opción no válida" ;;
     esac
 }
