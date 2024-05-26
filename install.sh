@@ -4,7 +4,10 @@ function install_udpmod {
     clear
     rm -rf $(pwd)/$0
 
+    echo ""
     read -p "Ingresa tu dominio: " domain
+    echo ""
+    read -p "Ingresa el puerto: " port
 
     apt update -y
     apt upgrade -y
@@ -16,7 +19,7 @@ function install_udpmod {
 
     OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
 
-    interfas=$(ip -4 route ls|grep default|grep -Po '(?<=dev )(\S+)'|head -1)
+    interfas=$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)
 
     sys=$(which sysctl)
 
@@ -44,10 +47,12 @@ function install_udpmod {
     systemctl start udpmod
     systemctl enable udpmod
 
+    clear
     echo "obfs: ${OBFS}" > ${dir}/UDPMOD/data
-    echo "port: 36712" >> ${dir}/UDPMOD/data
+    echo "port: ${port}" >> ${dir}/UDPMOD/data
     echo "rango de puertos: 10000:65000" >> ${dir}/UDPMOD/data
     cat ${dir}/UDPMOD/data
+    echo ""
     read -p "Presiona Enter para volver al menú..."
 }
 
