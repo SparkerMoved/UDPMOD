@@ -48,6 +48,7 @@ function install_udpmod {
     echo "port: 36712" >> ${dir}/UDPMOD/data
     echo "rango de puertos: 10000:65000" >> ${dir}/UDPMOD/data
     cat ${dir}/UDPMOD/data
+    read -p "Presiona Enter para volver al menú..."
 }
 
 function uninstall_udpmod {
@@ -58,6 +59,7 @@ function uninstall_udpmod {
     systemctl daemon-reload
     rm -rf $(pwd)/UDPMOD
     echo "UDPMOD desinstalado."
+    read -p "Presiona Enter para volver al menú..."
 }
 
 function activate_udpmod {
@@ -72,6 +74,7 @@ function activate_udpmod {
             echo "UDPMOD activado."
         fi
     fi
+    read -p "Presiona Enter para volver al menú..."
 }
 
 function check_installation {
@@ -81,6 +84,7 @@ function check_installation {
     else
         echo "UDPMOD no está activo."
     fi
+    read -p "Presiona Enter para volver al menú..."
 }
 
 function change_port {
@@ -91,6 +95,7 @@ function change_port {
     echo "port: ${new_port}" > $(pwd)/UDPMOD/data
     systemctl restart udpmod
     echo "UDPMOD ha sido reiniciado con el nuevo puerto."
+    read -p "Presiona Enter para volver al menú..."
 }
 
 function menu {
