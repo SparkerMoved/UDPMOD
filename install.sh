@@ -1,6 +1,7 @@
 #!/bin/bash
 
 function install_udpmod {
+    clear
     rm -rf $(pwd)/$0
 
     read -p "Ingresa tu dominio: " domain
@@ -50,6 +51,7 @@ function install_udpmod {
 }
 
 function uninstall_udpmod {
+    clear
     systemctl stop udpmod
     systemctl disable udpmod
     rm -f /etc/systemd/system/udpmod.service
@@ -59,6 +61,7 @@ function uninstall_udpmod {
 }
 
 function activate_udpmod {
+    clear
     if systemctl is-active --quiet udpmod; then
         echo "UDPMOD ya está activo."
     else
@@ -72,6 +75,7 @@ function activate_udpmod {
 }
 
 function check_installation {
+    clear
     if systemctl is-active --quiet udpmod; then
         echo "UDPMOD está instalado y activo."
     else
@@ -80,6 +84,7 @@ function check_installation {
 }
 
 function change_port {
+    clear
     read -p "Ingresa el nuevo puerto: " new_port
     sed -i "s/\"port\": [0-9]\+/$new_port/" $(pwd)/UDPMOD/config.json
     echo "El puerto ha sido cambiado a ${new_port}."
@@ -89,6 +94,7 @@ function change_port {
 }
 
 function menu {
+    clear
     echo "1. Instalar UDPMOD"
     echo "2. Desinstalar UDPMOD"
     echo "3. Activar UDPMOD"
