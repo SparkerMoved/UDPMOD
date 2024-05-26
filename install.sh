@@ -48,9 +48,10 @@ function install_udpmod {
     systemctl enable udpmod
 
     clear
+    echo ""
     echo "Dominio: ${domain}" >> ${dir}/UDPMOD/data
     echo "Obfs: ${OBFS}" > ${dir}/UDPMOD/data
-    echo "Puerto: ${port}" >> ${dir}/UDPMOD/data
+    echo "PUERTO: ${port}" >> ${dir}/UDPMOD/data
     echo "rango de puertos: 10000:65000" >> ${dir}/UDPMOD/data
     cat ${dir}/UDPMOD/data
     echo ""
