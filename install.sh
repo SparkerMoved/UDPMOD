@@ -49,10 +49,10 @@ function install_udpmod {
 
     clear
     echo ""
-    echo "Dominio: ${domain}" >> ${dir}/UDPMOD/data
-    echo "Obfs: ${OBFS}" > ${dir}/UDPMOD/data
-    echo "PUERTO: ${port}" >> ${dir}/UDPMOD/data
+    echo "obfs: ${OBFS}" > ${dir}/UDPMOD/data
+    echo "port: ${port}" >> ${dir}/UDPMOD/data
     echo "rango de puertos: 10000:65000" >> ${dir}/UDPMOD/data
+    echo "dominio: ${domain}" >> ${dir}/UDPMOD/data
     cat ${dir}/UDPMOD/data
     echo ""
     read -p "Presiona Enter para volver al menú..."
@@ -65,7 +65,7 @@ function uninstall_udpmod {
     rm -f /etc/systemd/system/udpmod.service
     systemctl daemon-reload
     rm -rf $(pwd)/UDPMOD
-    echo "UDPMOD desinstalado."
+    echo "UDPMOD desinstalado y carpeta UDPMOD eliminada."
     read -p "Presiona Enter para volver al menú..."
 }
 
@@ -117,6 +117,7 @@ function show_data {
 
 function menu {
     clear
+    echo ""
     echo "1. Instalar UDPMOD"
     echo "2. Desinstalar UDPMOD"
     echo "3. Activar UDPMOD"
@@ -124,6 +125,7 @@ function menu {
     echo "5. Cambiar puerto"
     echo "6. Mostrar datos"
     echo "7. Salir"
+    echo ""
     read -p "Elige una opción: " choice
     case $choice in
         1) install_udpmod ;;
